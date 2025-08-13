@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function Admin() {
   const [user, setUser] = useState<any>(null);
@@ -32,6 +33,7 @@ export default function Admin() {
   const [wholesaleRules, setWholesaleRules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUser();
@@ -230,11 +232,12 @@ export default function Admin() {
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="products">Produtos</TabsTrigger>
             <TabsTrigger value="representatives">Representantes</TabsTrigger>
             <TabsTrigger value="orders">Pedidos</TabsTrigger>
             <TabsTrigger value="wholesale">Atacado</TabsTrigger>
+            <TabsTrigger value="stock">Estoque</TabsTrigger>
           </TabsList>
 
           <TabsContent value="products" className="space-y-4">
@@ -335,7 +338,9 @@ export default function Admin() {
           <TabsContent value="wholesale" className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Regras de Atacado</h2>
-              <Button>Adicionar Regra</Button>
+              <Button onClick={() => navigate("/admin/wholesale-rules")}>
+                Gerenciar Regras
+              </Button>
             </div>
             <div className="grid gap-4">
               {wholesaleRules.map((rule) => (
@@ -356,6 +361,46 @@ export default function Admin() {
                       <Button variant="ghost" size="sm">
                         <Trash2 className="h-4 w-4" />
                       </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="stock" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Controle de Estoque</h2>
+              <Button>Atualizar Estoque</Button>
+            </div>
+            <div className="grid gap-4">
+              {products.map((product) => (
+                <Card key={product.id}>
+                  <CardContent className="flex items-center justify-between p-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-muted rounded-lg"></div>
+                      <div>
+                        <h3 className="font-medium">{product.name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          SKU: {product.sku || "Não definido"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <div className="text-right">
+                        <p className="text-sm text-muted-foreground">Estoque</p>
+                        <p className={`font-semibold ${(product.stock_quantity || 0) < 10 ? 'text-destructive' : 'text-foreground'}`}>
+                          {product.stock_quantity || 0} un.
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant={(product.stock_quantity || 0) < 10 ? "destructive" : "default"}>
+                          {(product.stock_quantity || 0) < 10 ? "Baixo" : "OK"}
+                        </Badge>
+                        <Button variant="ghost" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
