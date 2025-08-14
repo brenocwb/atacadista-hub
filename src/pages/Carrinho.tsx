@@ -9,6 +9,7 @@ import { Trash2, Plus, Minus, ShoppingBag, Package } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useCartContext } from "@/contexts/CartContext";
 
 interface CartItem {
   id: string;
@@ -49,6 +50,7 @@ export default function Carrinho() {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { cartItemsCount, refreshCartCount } = useCartContext();
 
   useEffect(() => {
     fetchUser();
@@ -155,6 +157,9 @@ export default function Carrinho() {
           item.id === itemId ? { ...item, quantity: newQuantity } : item
         )
       );
+      
+      // Refresh cart count
+      await refreshCartCount();
     } catch (error) {
       toast({
         variant: "destructive",
@@ -174,6 +179,10 @@ export default function Carrinho() {
       if (error) throw error;
 
       setCartItems(items => items.filter(item => item.id !== itemId));
+      
+      // Refresh cart count
+      await refreshCartCount();
+      
       toast({
         title: "Item removido",
         description: "O item foi removido do carrinho.",
@@ -264,6 +273,9 @@ export default function Carrinho() {
         description: `Pedido #${order.id.slice(0, 8)} foi criado.`,
       });
 
+      // Refresh cart count after clearing cart
+      await refreshCartCount();
+
       navigate("/pedidos");
     } catch (error) {
       console.error("Erro ao criar pedido:", error);
@@ -278,7 +290,7 @@ export default function Carrinho() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header user={user} />
+        <Header user={user} cartItemsCount={cartItemsCount} />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="text-center animate-fade-in">Carregando carrinho...</div>
         </div>
@@ -290,7 +302,7 @@ export default function Carrinho() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header user={user} />
+      <Header user={user} cartItemsCount={cartItemsCount} />
       
       <main className="max-w-4xl mx-auto px-4 py-8 animate-fade-in">
         <div className="mb-8">

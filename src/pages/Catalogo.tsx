@@ -9,6 +9,8 @@ import { Search, Plus, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/hooks/useCart";
+import { useCartContext } from "@/contexts/CartContext";
+import { ProductVariantModal } from "@/components/catalog/ProductVariantModal";
 
 interface Product {
   id: string;
@@ -33,8 +35,11 @@ export default function Catalogo() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const { toast } = useToast();
   const { addToCart, loading: addingToCart } = useCart();
+  const { cartItemsCount } = useCartContext();
 
   useEffect(() => {
     fetchUser();
@@ -98,13 +103,31 @@ export default function Catalogo() {
   });
 
   const handleAddToCart = async (product: Product) => {
-    await addToCart(product.id);
+    // First check if product has variants
+    const { data: variants } = await supabase
+      .from("product_variants")
+      .select("id")
+      .eq("product_id", product.id)
+      .eq("is_active", true);
+
+    if (variants && variants.length > 0) {
+      // Product has variants, open modal
+      setSelectedProduct(product);
+      setModalOpen(true);
+    } else {
+      // Product has no variants, add directly
+      await addToCart(product.id);
+    }
+  };
+
+  const handleModalAddToCart = async (productId: string, variantId?: string, quantity: number = 1) => {
+    return await addToCart(productId, variantId, quantity);
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header user={user} />
+        <Header user={user} cartItemsCount={cartItemsCount} />
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="text-center">Carregando catálogo...</div>
         </div>
@@ -114,7 +137,7 @@ export default function Catalogo() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header user={user} />
+      <Header user={user} cartItemsCount={cartItemsCount} />
       
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Hero Section */}
@@ -208,6 +231,19 @@ export default function Catalogo() {
           </div>
         )}
       </main>
+
+      {/* Product Variant Modal */}
+      {selectedProduct && (
+        <ProductVariantModal
+          product={selectedProduct}
+          open={modalOpen}
+          onOpenChange={(open) => {
+            setModalOpen(open);
+            if (!open) setSelectedProduct(null);
+          }}
+          onAddToCart={handleModalAddToCart}
+        />
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useCartContext } from "@/contexts/CartContext";
 
 export interface CartItem {
   id: string;
@@ -12,6 +13,7 @@ export interface CartItem {
 export const useCart = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { refreshCartCount } = useCartContext();
 
   const addToCart = async (productId: string, variantId?: string, quantity: number = 1) => {
     setLoading(true);
@@ -80,6 +82,9 @@ export const useCart = () => {
         title: "Item adicionado",
         description: "Produto foi adicionado ao carrinho com sucesso.",
       });
+
+      // Refresh cart count in context
+      await refreshCartCount();
 
       return true;
     } catch (error) {
