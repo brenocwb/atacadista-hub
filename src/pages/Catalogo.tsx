@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Plus, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useCart } from "@/hooks/useCart";
 
 interface Product {
   id: string;
@@ -33,6 +34,7 @@ export default function Catalogo() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
+  const { addToCart, loading: addingToCart } = useCart();
 
   useEffect(() => {
     fetchUser();
@@ -95,12 +97,8 @@ export default function Catalogo() {
     return matchesSearch && matchesCategory;
   });
 
-  const addToCart = async (product: Product) => {
-    // TODO: Implementar lógica do carrinho
-    toast({
-      title: "Produto adicionado!",
-      description: `${product.name} foi adicionado ao carrinho.`,
-    });
+  const handleAddToCart = async (product: Product) => {
+    await addToCart(product.id);
   };
 
   if (loading) {
@@ -188,12 +186,13 @@ export default function Catalogo() {
                     R$ {product.base_price.toFixed(2)}
                   </span>
                   <Button
-                    onClick={() => addToCart(product)}
+                    onClick={() => handleAddToCart(product)}
                     size="sm"
                     className="gap-2"
+                    disabled={addingToCart}
                   >
                     <Plus className="h-4 w-4" />
-                    Adicionar
+                    {addingToCart ? "Adicionando..." : "Adicionar"}
                   </Button>
                 </div>
               </CardContent>

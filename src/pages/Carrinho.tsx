@@ -290,7 +290,7 @@ export default function Carrinho() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header user={user} cartItemsCount={cartItems.length} />
+      <Header user={user} />
       
       <main className="max-w-4xl mx-auto px-4 py-8 animate-fade-in">
         <div className="mb-8">
@@ -387,7 +387,7 @@ export default function Carrinho() {
                   
                   {applicableRule && (
                     <>
-                      <div className="flex justify-between text-brand-gold">
+                      <div className="flex justify-between text-accent">
                         <span>Desconto de atacado:</span>
                         <span>-R$ {discountAmount.toFixed(2)}</span>
                       </div>
@@ -420,11 +420,11 @@ export default function Carrinho() {
                     {wholesaleRules.map((rule) => (
                       <div
                         key={rule.id}
-                        className={`flex justify-between text-sm p-2 rounded ${
-                          totalQuantity >= rule.min_quantity
-                            ? "bg-brand-gold/20 text-brand-gold"
-                            : "text-muted-foreground"
-                        }`}
+                         className={`flex justify-between text-sm p-2 rounded ${
+                           totalQuantity >= rule.min_quantity
+                             ? "bg-accent/20 text-accent"
+                             : "text-muted-foreground"
+                         }`}
                       >
                         <span>{rule.min_quantity}+ peças:</span>
                         <span>{rule.discount_percentage}% off</span>
