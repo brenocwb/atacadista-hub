@@ -243,7 +243,9 @@ export default function Admin() {
           <TabsContent value="products" className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Produtos Recentes</h2>
-              <Button>Adicionar Produto</Button>
+              <Button onClick={() => navigate("/admin/cadastrar-produto")}>
+                Adicionar Produto
+              </Button>
             </div>
             <div className="grid gap-4">
               {products.map((product) => (
@@ -278,7 +280,9 @@ export default function Admin() {
           <TabsContent value="representatives" className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Representantes</h2>
-              <Button>Adicionar Representante</Button>
+              <Button onClick={() => navigate("/admin/cadastrar-representante")}>
+                Adicionar Representante
+              </Button>
             </div>
             <div className="grid gap-4">
               {representatives.map((rep) => (

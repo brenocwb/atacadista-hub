@@ -12,6 +12,8 @@ import Catalogo from "./pages/Catalogo";
 import Carrinho from "./pages/Carrinho";
 import Pedidos from "./pages/Pedidos";
 import WholesaleRules from "./pages/WholesaleRules";
+import CadastrarProduto from "./pages/CadastrarProduto";
+import CadastrarRepresentante from "./pages/CadastrarRepresentante";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +39,8 @@ const App = () => {
               <Route path="/carrinho" element={<Carrinho />} />
               <Route path="/pedidos" element={<Pedidos />} />
               <Route path="/admin/wholesale-rules" element={<WholesaleRules />} />
+              <Route path="/admin/cadastrar-produto" element={<CadastrarProduto />} />
+              <Route path="/admin/cadastrar-representante" element={<CadastrarRepresentante />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
