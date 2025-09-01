@@ -7,14 +7,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, Package, Clock, CheckCircle, XCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useCartContext } from "@/contexts/CartContext";
+import { OrderDetailsModal } from "@/components/OrderDetailsModal";
 
 interface Order {
   id: string;
   status: string;
   total_amount: number;
+  subtotal: number;
+  discount_amount: number;
   total_items: number;
   discount_percentage: number;
   created_at: string;
+  notes?: string;
   order_items: {
     id: string;
     quantity: number;
@@ -35,7 +40,10 @@ export default function Pedidos() {
   const [user, setUser] = useState<any>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
+  const { cartItemsCount } = useCartContext();
 
   useEffect(() => {
     fetchUser();
@@ -67,26 +75,29 @@ export default function Pedidos() {
 
       if (!profile) return;
 
-      const { data, error } = await supabase
-        .from("orders")
-        .select(`
-          id,
-          status,
-          total_amount,
-          total_items,
-          discount_percentage,
-          created_at,
-          order_items(
+        const { data, error } = await supabase
+          .from("orders")
+          .select(`
             id,
-            quantity,
-            unit_price,
-            total_price,
-            product:products(name, images),
-            variant:product_variants(size, color)
-          )
-        `)
-        .eq("representative_id", profile.id)
-        .order("created_at", { ascending: false });
+            status,
+            total_amount,
+            subtotal,
+            discount_amount,
+            total_items,
+            discount_percentage,
+            created_at,
+            notes,
+            order_items(
+              id,
+              quantity,
+              unit_price,
+              total_price,
+              product:products(name, images),
+              variant:product_variants(size, color)
+            )
+          `)
+          .eq("representative_id", profile.id)
+          .order("created_at", { ascending: false });
 
       if (error) throw error;
       setOrders(data || []);
@@ -142,11 +153,16 @@ export default function Pedidos() {
     return orders.filter(order => order.status === status);
   };
 
+  const handleViewOrder = (order: Order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header user={user} />
-        <div className="max-w-6xl mx-auto px-4 py-8">
+        <Header user={user} cartItemsCount={cartItemsCount} />
+        <div className="max-6xl mx-auto px-4 py-8">
           <div className="text-center animate-fade-in">Carregando pedidos...</div>
         </div>
       </div>
@@ -155,7 +171,7 @@ export default function Pedidos() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header user={user} />
+      <Header user={user} cartItemsCount={cartItemsCount} />
       
       <main className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
         <div className="mb-8">
@@ -175,31 +191,37 @@ export default function Pedidos() {
           </TabsList>
 
           <TabsContent value="all" className="space-y-4">
-            <OrdersList orders={orders} />
+            <OrdersList orders={orders} onViewOrder={handleViewOrder} />
           </TabsContent>
 
           <TabsContent value="pending" className="space-y-4">
-            <OrdersList orders={filterOrdersByStatus("pending")} />
+            <OrdersList orders={filterOrdersByStatus("pending")} onViewOrder={handleViewOrder} />
           </TabsContent>
 
           <TabsContent value="processing" className="space-y-4">
-            <OrdersList orders={filterOrdersByStatus("processing")} />
+            <OrdersList orders={filterOrdersByStatus("processing")} onViewOrder={handleViewOrder} />
           </TabsContent>
 
           <TabsContent value="shipped" className="space-y-4">
-            <OrdersList orders={filterOrdersByStatus("shipped")} />
+            <OrdersList orders={filterOrdersByStatus("shipped")} onViewOrder={handleViewOrder} />
           </TabsContent>
 
           <TabsContent value="delivered" className="space-y-4">
-            <OrdersList orders={filterOrdersByStatus("delivered")} />
+            <OrdersList orders={filterOrdersByStatus("delivered")} onViewOrder={handleViewOrder} />
           </TabsContent>
         </Tabs>
       </main>
+
+      <OrderDetailsModal
+        order={selectedOrder}
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+      />
     </div>
   );
 }
 
-function OrdersList({ orders }: { orders: Order[] }) {
+function OrdersList({ orders, onViewOrder }: { orders: Order[]; onViewOrder: (order: Order) => void }) {
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive"> = {
       pending: "secondary",
@@ -270,7 +292,7 @@ function OrdersList({ orders }: { orders: Order[] }) {
                   })}
                 </p>
               </div>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => onViewOrder(order)}>
                 <Eye className="h-4 w-4 mr-2" />
                 Detalhes
               </Button>

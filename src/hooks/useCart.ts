@@ -2,6 +2,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useCartContext } from "@/contexts/CartContext";
+import { useStock } from "@/hooks/useStock";
 
 export interface CartItem {
   id: string;
@@ -14,10 +15,22 @@ export const useCart = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { refreshCartCount } = useCartContext();
+  const { checkStock } = useStock();
 
   const addToCart = async (productId: string, variantId?: string, quantity: number = 1) => {
     setLoading(true);
     try {
+      // Check stock availability first
+      const stockInfo = await checkStock(productId, variantId);
+      if (!stockInfo || stockInfo.available < quantity) {
+        toast({
+          variant: "destructive",
+          title: "Estoque insuficiente",
+          description: `Apenas ${stockInfo?.available || 0} unidades disponíveis.`,
+        });
+        return false;
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({
@@ -57,10 +70,21 @@ export const useCart = () => {
       }
 
       if (existingItem) {
+        // Check if total quantity would exceed stock
+        const newTotalQuantity = (existingItem as any).quantity + quantity;
+        if (stockInfo.available < newTotalQuantity) {
+          toast({
+            variant: "destructive",
+            title: "Estoque insuficiente",
+            description: `Você já tem ${(existingItem as any).quantity} unidades no carrinho. Máximo disponível: ${stockInfo.available}`,
+          });
+          return false;
+        }
+
         // Update quantity
         const { error } = await supabase
           .from("cart_items" as any)
-          .update({ quantity: (existingItem as any).quantity + quantity })
+          .update({ quantity: newTotalQuantity })
           .eq("id", (existingItem as any).id);
 
         if (error) throw error;

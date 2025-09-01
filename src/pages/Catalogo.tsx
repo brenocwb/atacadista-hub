@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/hooks/useCart";
 import { useCartContext } from "@/contexts/CartContext";
+import { useStock } from "@/hooks/useStock";
 import { ProductVariantModal } from "@/components/catalog/ProductVariantModal";
 
 interface Product {
@@ -21,6 +22,7 @@ interface Product {
   category_id: string;
   sku: string;
   is_active: boolean;
+  stock_quantity?: number;
 }
 
 interface Category {
@@ -37,9 +39,11 @@ export default function Catalogo() {
   const [user, setUser] = useState<any>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [stockInfo, setStockInfo] = useState<Record<string, number>>({});
   const { toast } = useToast();
   const { addToCart, loading: addingToCart } = useCart();
   const { cartItemsCount } = useCartContext();
+  const { checkStock } = useStock();
 
   useEffect(() => {
     fetchUser();
@@ -69,6 +73,18 @@ export default function Catalogo() {
 
       if (error) throw error;
       setProducts(data || []);
+      
+      // Load stock information for each product
+      if (data) {
+        const stockData: Record<string, number> = {};
+        await Promise.all(
+          data.map(async (product) => {
+            const stock = await checkStock(product.id);
+            stockData[product.id] = stock?.available || 0;
+          })
+        );
+        setStockInfo(stockData);
+      }
     } catch (error) {
       toast({
         variant: "destructive",
@@ -204,6 +220,19 @@ export default function Catalogo() {
                 <CardDescription className="mb-4 line-clamp-2">
                   {product.description}
                 </CardDescription>
+                
+                <div className="mb-3">
+                  <Badge 
+                    variant={stockInfo[product.id] > 0 ? "default" : "destructive"}
+                    className="text-xs"
+                  >
+                    {stockInfo[product.id] > 0 
+                      ? `${stockInfo[product.id]} disponível${stockInfo[product.id] > 1 ? 'is' : ''}`
+                      : "Sem estoque"
+                    }
+                  </Badge>
+                </div>
+                
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-primary">
                     R$ {product.base_price.toFixed(2)}
@@ -212,10 +241,10 @@ export default function Catalogo() {
                     onClick={() => handleAddToCart(product)}
                     size="sm"
                     className="gap-2"
-                    disabled={addingToCart}
+                    disabled={addingToCart || stockInfo[product.id] === 0}
                   >
                     <Plus className="h-4 w-4" />
-                    {addingToCart ? "Adicionando..." : "Adicionar"}
+                    {stockInfo[product.id] === 0 ? "Indisponível" : (addingToCart ? "Adicionando..." : "Adicionar")}
                   </Button>
                 </div>
               </CardContent>
