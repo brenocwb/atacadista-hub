@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import Admin from "./pages/Admin";
 import Catalogo from "./pages/Catalogo";
 import Carrinho from "./pages/Carrinho";
@@ -34,6 +35,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/catalogo" element={<Catalogo />} />
               <Route path="/carrinho" element={<Carrinho />} />
