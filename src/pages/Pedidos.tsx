@@ -40,7 +40,7 @@ export default function Pedidos() {
   const [user, setUser] = useState<any>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
   const { cartItemsCount } = useCartContext();
@@ -154,7 +154,7 @@ export default function Pedidos() {
   };
 
   const handleViewOrder = (order: Order) => {
-    setSelectedOrder(order);
+    setSelectedOrder(order.id);
     setIsModalOpen(true);
   };
 
@@ -213,7 +213,7 @@ export default function Pedidos() {
       </main>
 
       <OrderDetailsModal
-        order={selectedOrder}
+        orderId={selectedOrder}
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
       />

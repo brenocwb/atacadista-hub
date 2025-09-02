@@ -1,7 +1,9 @@
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Calendar, Package, DollarSign, User } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface OrderItem {
   id: string;
@@ -32,7 +34,7 @@ interface Order {
 }
 
 interface OrderDetailsModalProps {
-  order: Order | null;
+  orderId: string | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -56,7 +58,76 @@ const getStatusBadge = (status: string) => {
   );
 };
 
-export function OrderDetailsModal({ order, open, onOpenChange }: OrderDetailsModalProps) {
+export function OrderDetailsModal({ orderId, open, onOpenChange }: OrderDetailsModalProps) {
+  const [order, setOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (orderId && open) {
+      fetchOrder();
+    }
+  }, [orderId, open]);
+
+  const fetchOrder = async () => {
+    if (!orderId) return;
+    
+    setLoading(true);
+    try {
+      // Fetch order details
+      const { data: orderData, error: orderError } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("id", orderId)
+        .single();
+
+      if (orderError) throw orderError;
+
+      // Fetch order items with product details
+      const { data: orderItems, error: itemsError } = await supabase
+        .from("order_items")
+        .select(`
+          *,
+          products:product_id (
+            name,
+            images
+          ),
+          product_variants:variant_id (
+            size,
+            color
+          )
+        `)
+        .eq("order_id", orderId);
+
+      if (itemsError) throw itemsError;
+
+      // Transform the data to match the expected format
+      const transformedOrder = {
+        ...orderData,
+        order_items: orderItems.map(item => ({
+          ...item,
+          product: item.products,
+          variant: item.product_variants
+        }))
+      };
+
+      setOrder(transformedOrder);
+    } catch (error) {
+      console.error("Error fetching order details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!orderId || !open) return null;
+  if (loading) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <div className="text-center py-8">Carregando detalhes do pedido...</div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
   if (!order) return null;
 
   return (

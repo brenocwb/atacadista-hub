@@ -64,6 +64,15 @@ export const Header = ({ user, cartItemsCount = 0 }: HeaderProps) => {
             >
               Meus Pedidos
             </Button>
+            {user?.role === "representante" && (
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/dashboard")}
+                className="text-foreground hover:text-primary"
+              >
+                Dashboard
+              </Button>
+            )}
             {user?.role === "admin" && (
               <Button
                 variant="ghost"
@@ -150,6 +159,18 @@ export const Header = ({ user, cartItemsCount = 0 }: HeaderProps) => {
               >
                 Meus Pedidos
               </Button>
+              {user?.role === "representante" && (
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    navigate("/dashboard");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  Dashboard
+                </Button>
+              )}
               {user?.role === "admin" && (
                 <Button
                   variant="ghost"

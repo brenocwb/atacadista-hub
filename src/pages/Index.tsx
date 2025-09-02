@@ -184,6 +184,22 @@ const Index = () => {
             </CardContent>
           </Card>
 
+          {user.role === "representante" && (
+            <Card className="cursor-pointer hover:shadow-elegant transition-all duration-300" onClick={() => navigate("/dashboard")}>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Dashboard
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Veja suas vendas e comissões
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
           <Card className="cursor-pointer hover:shadow-elegant transition-all duration-300" onClick={() => navigate("/carrinho")}>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2">

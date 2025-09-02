@@ -15,6 +15,8 @@ import Pedidos from "./pages/Pedidos";
 import WholesaleRules from "./pages/WholesaleRules";
 import CadastrarProduto from "./pages/CadastrarProduto";
 import CadastrarRepresentante from "./pages/CadastrarRepresentante";
+import Dashboard from "./pages/Dashboard";
+import Perfil from "./pages/Perfil";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,6 +45,8 @@ const App = () => {
               <Route path="/admin/wholesale-rules" element={<WholesaleRules />} />
               <Route path="/admin/cadastrar-produto" element={<CadastrarProduto />} />
               <Route path="/admin/cadastrar-representante" element={<CadastrarRepresentante />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/perfil" element={<Perfil />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
