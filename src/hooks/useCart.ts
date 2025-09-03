@@ -41,26 +41,11 @@ export const useCart = () => {
         return false;
       }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
-
-      if (!profile) {
-        toast({
-          variant: "destructive",
-          title: "Erro",
-          description: "Perfil não encontrado.",
-        });
-        return false;
-      }
-
       // Check if item already exists in cart
       const { data: existingItem, error: existingError } = await supabase
         .from("cart_items" as any)
         .select("*")
-        .eq("user_id", profile.id)
+        .eq("user_id", user.id)
         .eq("product_id", productId)
         .eq("variant_id", variantId || null)
         .maybeSingle();
@@ -93,7 +78,7 @@ export const useCart = () => {
         const { error } = await supabase
           .from("cart_items" as any)
           .insert({
-            user_id: profile.id,
+            user_id: user.id,
             product_id: productId,
             variant_id: variantId,
             quantity: quantity

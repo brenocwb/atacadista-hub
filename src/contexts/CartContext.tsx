@@ -31,21 +31,10 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         return;
       }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
-
-      if (!profile) {
-        setCartItemsCount(0);
-        return;
-      }
-
       const { data: cartItems, error } = await supabase
         .from("cart_items" as any)
         .select("quantity")
-        .eq("user_id", profile.id);
+        .eq("user_id", user.id);
 
       if (error) throw error;
 

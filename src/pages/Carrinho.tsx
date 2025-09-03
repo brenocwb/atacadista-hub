@@ -75,19 +75,11 @@ export default function Carrinho() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
-
-      if (!profile) return;
-
       // Use a simpler approach due to TypeScript limitations
       const { data: cartData, error } = await supabase
         .from("cart_items" as any)
         .select("*")
-        .eq("user_id", profile.id);
+        .eq("user_id", user.id);
 
       if (error) throw error;
 
@@ -261,12 +253,15 @@ export default function Carrinho() {
       if (itemsError) throw itemsError;
 
       // Clear cart
-      const { error: clearError } = await supabase
-        .from("cart_items" as any)
-        .delete()
-        .eq("user_id", user.id);
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
+        const { error: clearError } = await supabase
+          .from("cart_items" as any)
+          .delete()
+          .eq("user_id", authUser.id);
 
-      if (clearError) throw clearError;
+        if (clearError) throw clearError;
+      }
 
       toast({
         title: "Pedido criado com sucesso!",
