@@ -310,7 +310,12 @@ export default function Admin() {
           </TabsContent>
 
           <TabsContent value="orders" className="space-y-4">
-            <h2 className="text-xl font-semibold">Pedidos Recentes</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Pedidos Recentes</h2>
+              <Button onClick={() => navigate("/admin/pedidos")}>
+                Gerenciar Todos os Pedidos
+              </Button>
+            </div>
             <div className="grid gap-4">
               {orders.map((order) => (
                 <Card key={order.id}>

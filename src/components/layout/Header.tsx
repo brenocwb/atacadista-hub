@@ -74,13 +74,22 @@ export const Header = ({ user, cartItemsCount = 0 }: HeaderProps) => {
               </Button>
             )}
             {user?.role === "admin" && (
-              <Button
-                variant="ghost"
-                onClick={() => navigate("/admin")}
-                className="text-foreground hover:text-primary"
-              >
-                Painel Admin
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/admin")}
+                  className="text-foreground hover:text-primary"
+                >
+                  Painel Admin
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/admin/pedidos")}
+                  className="text-foreground hover:text-primary"
+                >
+                  Gestão de Pedidos
+                </Button>
+              </>
             )}
           </nav>
 
@@ -172,16 +181,28 @@ export const Header = ({ user, cartItemsCount = 0 }: HeaderProps) => {
                 </Button>
               )}
               {user?.role === "admin" && (
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start"
-                  onClick={() => {
-                    navigate("/admin");
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  Painel Admin
-                </Button>
+                <>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      navigate("/admin");
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Painel Admin
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      navigate("/admin/pedidos");
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Gestão de Pedidos
+                  </Button>
+                </>
               )}
             </div>
           </div>
