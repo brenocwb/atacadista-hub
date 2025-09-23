@@ -219,6 +219,10 @@ export default function Carrinho() {
     try {
       const { totalQuantity, subtotal, discountAmount, total, applicableRule } = calculateTotals();
 
+      // Calculate commission
+      const commissionRate = user.commission_rate || 0;
+      const commissionAmount = total * (commissionRate / 100);
+
       // Create order
       const { data: order, error: orderError } = await supabase
         .from("orders")
@@ -229,6 +233,8 @@ export default function Carrinho() {
           discount_amount: discountAmount,
           discount_percentage: applicableRule?.discount_percentage || 0,
           total_amount: total,
+          commission_rate: commissionRate,
+          commission_amount: commissionAmount,
           status: "pending"
         })
         .select()
