@@ -59,6 +59,54 @@ export type Database = {
           },
         ]
       }
+      notification_logs: {
+        Row: {
+          created_at: string | null
+          email_sent: boolean | null
+          id: string
+          message: string
+          notification_type: string
+          sent_at: string | null
+          subject: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email_sent?: boolean | null
+          id?: string
+          message: string
+          notification_type: string
+          sent_at?: string | null
+          subject: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email_sent?: boolean | null
+          id?: string
+          message?: string
+          notification_type?: string
+          sent_at?: string | null
+          subject?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "sales_reports"
+            referencedColumns: ["representative_id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string | null
@@ -167,6 +215,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_representative_id_fkey"
+            columns: ["representative_id"]
+            isOneToOne: false
+            referencedRelation: "sales_reports"
+            referencedColumns: ["representative_id"]
           },
         ]
       }
@@ -293,6 +348,9 @@ export type Database = {
       }
       profiles: {
         Row: {
+          approval_status: string
+          approved_at: string | null
+          approved_by: string | null
           commission_rate: number | null
           coverage_area: string | null
           created_at: string | null
@@ -301,11 +359,15 @@ export type Database = {
           id: string
           is_active: boolean | null
           phone: string | null
+          rejection_reason: string | null
           role: string
           updated_at: string | null
           user_id: string
         }
         Insert: {
+          approval_status?: string
+          approved_at?: string | null
+          approved_by?: string | null
           commission_rate?: number | null
           coverage_area?: string | null
           created_at?: string | null
@@ -314,11 +376,15 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           phone?: string | null
+          rejection_reason?: string | null
           role?: string
           updated_at?: string | null
           user_id: string
         }
         Update: {
+          approval_status?: string
+          approved_at?: string | null
+          approved_by?: string | null
           commission_rate?: number | null
           coverage_area?: string | null
           created_at?: string | null
@@ -327,11 +393,27 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           phone?: string | null
+          rejection_reason?: string | null
           role?: string
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "sales_reports"
+            referencedColumns: ["representative_id"]
+          },
+        ]
       }
       wholesale_rules: {
         Row: {
@@ -362,7 +444,17 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      sales_reports: {
+        Row: {
+          month_year: string | null
+          representative_id: string | null
+          representative_name: string | null
+          total_commissions: number | null
+          total_orders: number | null
+          total_sales: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       is_admin: {
