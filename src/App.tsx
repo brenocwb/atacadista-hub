@@ -18,6 +18,8 @@ import CadastrarRepresentante from "./pages/CadastrarRepresentante";
 import Dashboard from "./pages/Dashboard";
 import Perfil from "./pages/Perfil";
 import AdminPedidos from "./pages/AdminPedidos";
+import ApproveRepresentatives from "./pages/ApproveRepresentatives";
+import SalesReports from "./pages/SalesReports";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,6 +49,8 @@ const App = () => {
               <Route path="/admin/cadastrar-produto" element={<CadastrarProduto />} />
               <Route path="/admin/cadastrar-representante" element={<CadastrarRepresentante />} />
               <Route path="/admin/pedidos" element={<AdminPedidos />} />
+              <Route path="/admin/approve-representatives" element={<ApproveRepresentatives />} />
+              <Route path="/admin/sales-reports" element={<SalesReports />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/perfil" element={<Perfil />} />
               <Route path="*" element={<NotFound />} />

@@ -83,8 +83,8 @@ export default function Signup() {
         }
       } else {
         toast({
-          title: "Cadastro realizado com sucesso!",
-          description: "Verificue seu e-mail para confirmar a conta.",
+          title: "Solicitação enviada com sucesso!",
+          description: "Aguarde a aprovação do administrador para acessar o sistema.",
         });
         
         // Se o usuário foi criado e está logado, redirecionar

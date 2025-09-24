@@ -457,6 +457,17 @@ export type Database = {
       }
     }
     Functions: {
+      get_sales_reports: {
+        Args: { end_date?: string; start_date?: string }
+        Returns: {
+          month_year: string
+          representative_id: string
+          representative_name: string
+          total_commissions: number
+          total_orders: number
+          total_sales: number
+        }[]
+      }
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean

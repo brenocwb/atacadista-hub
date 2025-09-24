@@ -89,6 +89,20 @@ export const Header = ({ user, cartItemsCount = 0 }: HeaderProps) => {
                 >
                   Gestão de Pedidos
                 </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/admin/approve-representatives")}
+                  className="text-foreground hover:text-primary"
+                >
+                  Aprovar Representantes
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/admin/sales-reports")}
+                  className="text-foreground hover:text-primary"
+                >
+                  Relatórios
+                </Button>
               </>
             )}
           </nav>
@@ -201,6 +215,26 @@ export const Header = ({ user, cartItemsCount = 0 }: HeaderProps) => {
                     }}
                   >
                     Gestão de Pedidos
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      navigate("/admin/approve-representatives");
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Aprovar Representantes
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      navigate("/admin/sales-reports");
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    Relatórios
                   </Button>
                 </>
               )}
